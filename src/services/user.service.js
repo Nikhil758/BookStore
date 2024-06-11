@@ -20,4 +20,23 @@ export const newUser = async (body) => {
     from: process.env.EMAIL
   });
   setUser(body);
+  return token;
+};
+
+export const userLogin = async (body) => {
+  let userObj = await User.findOne({ email: body.email });
+  if (userObj === null) {
+    throw new Error('Incorrect Email');
+  }
+  const isMatch = await bcrypt.compare(body.password, userObj.password);
+  if (isMatch) {
+    const token = jwt.sign(
+      { _id: userObj._id, role: userObj.role },
+      process.env.SECRETKEY,
+      { expiresIn: '2h' }
+    );
+    return token;
+  } else {
+    throw new Error('Incorrect Password');
+  }
 };

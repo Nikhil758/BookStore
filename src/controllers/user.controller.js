@@ -10,10 +10,11 @@ import { verifyEmail } from '../utils/verifyEmail';
  */
 export const newUser = async (req, res, next) => {
   try {
-    await UserService.newUser(req.body);
+    const token = await UserService.newUser(req.body);
     res.status(HttpStatus.CREATED).json({
       code: HttpStatus.CREATED,
-      message: 'User Created Sucessfully'
+      message: 'User Created Sucessfully',
+      data: token
     });
   } catch (error) {
     next(error);
@@ -45,3 +46,20 @@ export const registerUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const userLogin = async (req, res) => {
+  try {
+    const data = await UserService.userLogin(req.body);
+    res.status(HttpStatus.OK).json({
+      success: true,
+      message: 'User found in database',
+      data: data
+    });
+  } catch (error) {
+    res.status(HttpStatus.BAD_REQUEST).json({
+      code: HttpStatus.BAD_REQUEST,
+      message: `${error}`
+    });
+  }
+};
+
