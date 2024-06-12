@@ -40,7 +40,6 @@ export const adminVerify = async (req, res, next) => {
     if(role!=='admin')
       throw new Error('Not an admin');
     res.locals.id = _id;
-    // res.locals.token = bearerToken;
     next();
   } catch (error) {
     next(error);

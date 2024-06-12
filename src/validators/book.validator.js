@@ -5,7 +5,7 @@ export const newBookValidator = (req, res, next) => {
     bookName: Joi.string().min(4).required(),
     author: Joi.string().min(4).required(),
     description: Joi.string().min(2).required(),
-    quantity: Joi.string().min(2).required(),
+    quantity: Joi.string().min(1).required(),
     price: Joi.string().min(1).required(),
     discountPrice: Joi.string().min(1)
   });

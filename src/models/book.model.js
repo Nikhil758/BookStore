@@ -6,6 +6,9 @@ const bookSchema = new Schema(
         type: String,
         unique: true
       },
+      bookImage: {
+        type: String
+      },
       author: {
         type: String
       },
@@ -13,7 +16,8 @@ const bookSchema = new Schema(
         type: String
       },
       quantity: {
-        type: String
+        type: String,
+        default: 0
       },
       price: {
         type: String
