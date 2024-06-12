@@ -1,39 +1,42 @@
 import User from '../models/user.model';
-
-//get all users
-export const getAllUsers = async () => {
-  const data = await User.find();
-  return data;
-};
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import sendEmail from '../utils/email';
+import { setUser } from '../utils/redis.util';
 
 //create new user
 export const newUser = async (body) => {
-  const data = await User.create(body);
-  return data;
+  body.email = await body.email.toLowerCase();
+  let res = await User.findOne({ email: body.email });
+  if (res !== null) {
+    throw new Error('Email already exist');
+  }
+  body.password = await bcrypt.hash(body.password, 10);
+  const token = jwt.sign({ email: body.email },process.env.SECRETKEY);
+  sendEmail({
+    subject: "Email Verification",
+    text: token,
+    to: body.email,
+    from: process.env.EMAIL
+  });
+  setUser(body);
+  return token;
 };
 
-//update single user
-export const updateUser = async (_id, body) => {
-  const data = await User.findByIdAndUpdate(
-    {
-      _id
-    },
-    body,
-    {
-      new: true
-    }
-  );
-  return data;
-};
-
-//delete single user
-export const deleteUser = async (id) => {
-  await User.findByIdAndDelete(id);
-  return '';
-};
-
-//get single user
-export const getUser = async (id) => {
-  const data = await User.findById(id);
-  return data;
+export const userLogin = async (body) => {
+  let userObj = await User.findOne({ email: body.email });
+  if (userObj === null) {
+    throw new Error('Incorrect Email');
+  }
+  const isMatch = await bcrypt.compare(body.password, userObj.password);
+  if (isMatch) {
+    const token = jwt.sign(
+      { _id: userObj._id, role: userObj.role },
+      process.env.SECRETKEY,
+      { expiresIn: '2h' }
+    );
+    return token;
+  } else {
+    throw new Error('Incorrect Password');
+  }
 };
