@@ -6,7 +6,7 @@ import * as roleAssigner from '../utils/user.util'
 
 const router = express.Router();
 
-router.get('/user', userAuth, userController.registerUser);
+router.post('/verify', userAuth, userController.registerUser);
 
 router.post('/', newUserValidator, roleAssigner.userRole, userController.newUser);
 
