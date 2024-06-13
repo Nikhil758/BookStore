@@ -2,7 +2,10 @@ import Cart from '../models/cart.model';
 import Book from '../models/book.model';
 
 export const getCart = async (cartOwner) => {
-  const data = await Cart.findOne({ cartOwner });
+  const data = await Cart.findOne({ cartOwner }).populate({
+    path: 'books.book_id',
+    select: 'bookName author description price discountPrice bookImage'
+});
   return data;
 };
 
@@ -16,6 +19,9 @@ export const addBook = async (cartOwner, book_id) => {
   const bookDetails = await Book.findById(book_id); // Assuming Book is your book model
   if (!bookDetails) {
     throw new Error("Book not found");
+  }
+  if(bookDetails.quantity === '0'){
+    throw new Error("Book out of stock")
   }
   const bookPrice = parseInt(bookDetails.price, 10);
 

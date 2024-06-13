@@ -2,7 +2,10 @@ import Wishlist from '../models/wishlist.model';
 import Book from '../models/book.model';
 
 export const getWishlist = async (wishlistOwner) => {
-  const data = await Wishlist.findOne({ wishlistOwner });
+  const data = await Wishlist.findOne({ wishlistOwner }).populate({
+    path: 'books.book_id',
+    select: 'bookName author description price discountPrice bookImage'
+});
   return data;
 };
 
